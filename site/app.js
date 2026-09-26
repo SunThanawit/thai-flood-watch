@@ -470,15 +470,16 @@ $("prov-list").addEventListener("click", (e) => {
 /* ---------------- windy embed ---------------- */
 
 const WINDY_VIEWS = {
+  east: { lat: 13.1, lon: 101.2, zoom: 8, detailLat: 13.75, detailLon: 100.5 },
   focus: { lat: 13.749, lon: 99.742, zoom: 9 },
   thailand: { lat: 13.2, lon: 101.0, zoom: 5 },
 };
-const windy = { overlay: "rain", view: "focus" };
+const windy = { overlay: "rain", view: "east" };
 
 function updateWindy() {
   const v = WINDY_VIEWS[windy.view];
   const p = new URLSearchParams({
-    lat: v.lat, lon: v.lon, detailLat: v.lat, detailLon: v.lon, zoom: v.zoom,
+    lat: v.lat, lon: v.lon, detailLat: v.detailLat ?? v.lat, detailLon: v.detailLon ?? v.lon, zoom: v.zoom,
     level: "surface", overlay: windy.overlay, product: windy.overlay === "radar" ? "radar" : "ecmwf",
     menu: "", message: "true", marker: "", calendar: "now", pressure: "", type: "map",
     location: "coordinates", detail: "", metricWind: "km/h", metricTemp: "°C", radarRange: "-1",

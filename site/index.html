@@ -96,7 +96,7 @@
     </aside>
   </div>
 
-  <div class="grid">
+  <div class="stack">
     <section class="map-card" aria-labelledby="windy-h">
       <div class="map-tools">
         <h2 id="windy-h" class="tool-title">พยากรณ์ฝน Windy</h2>
@@ -106,20 +106,22 @@
           <button type="button" data-overlay="radar" aria-pressed="false">เรดาร์</button>
         </div>
         <div class="seg" role="group" aria-label="มุมมอง Windy" id="windy-view">
-          <button type="button" data-view="focus" aria-pressed="true">ภาคกลาง-ตะวันตก</button>
+          <button type="button" data-view="east" aria-pressed="true">กทม. + ภาคตะวันออก</button>
+          <button type="button" data-view="focus" aria-pressed="false">ภาคกลาง-ตะวันตก</button>
           <button type="button" data-view="thailand" aria-pressed="false">ทั้งประเทศ</button>
         </div>
       </div>
       <iframe id="windy" class="windy" title="แผนที่พยากรณ์ฝนจาก Windy" loading="lazy" allowfullscreen
-        src="https://embed.windy.com/embed2.html?lat=13.749&amp;lon=99.742&amp;detailLat=13.749&amp;detailLon=99.742&amp;zoom=9&amp;level=surface&amp;overlay=rain&amp;product=ecmwf&amp;menu=&amp;message=true&amp;marker=&amp;calendar=now&amp;pressure=&amp;type=map&amp;location=coordinates&amp;detail=&amp;metricWind=km%2Fh&amp;metricTemp=%C2%B0C&amp;radarRange=-1"></iframe>
+        src="https://embed.windy.com/embed2.html?lat=13.1&amp;lon=101.2&amp;detailLat=13.75&amp;detailLon=100.5&amp;zoom=8&amp;level=surface&amp;overlay=rain&amp;product=ecmwf&amp;menu=&amp;message=true&amp;marker=&amp;calendar=now&amp;pressure=&amp;type=map&amp;location=coordinates&amp;detail=&amp;metricWind=km%2Fh&amp;metricTemp=%C2%B0C&amp;radarRange=-1"></iframe>
       <div class="legend">
         <span>ใช้แถบเวลาด้านล่างแผนที่เพื่อดูพยากรณ์ล่วงหน้า</span>
-        <a id="windy-link" href="https://www.windy.com/-Rain-thunder-rain?rain,13.749,99.742,9,m:d2EaiVd" target="_blank" rel="noopener">เปิดใน Windy เต็มจอ ↗</a>
+        <a id="windy-link" href="https://www.windy.com/?rain,13.1,101.2,8" target="_blank" rel="noopener">เปิดใน Windy เต็มจอ ↗</a>
       </div>
     </section>
 
-    <aside class="card links-card" aria-labelledby="links-h">
+    <section class="card links-card" aria-labelledby="links-h">
       <h2 id="links-h">ติดตามสด</h2>
+      <div class="link-grid">
       <a class="link-tile" href="https://sites.research.google/floods/l/14.312423800500094/100.30929387367266/7.8700000000000045" target="_blank" rel="noopener">
         <span class="link-kicker">Google Flood Hub</span>
         <b>พยากรณ์น้ำท่วมตามลุ่มน้ำ ล่วงหน้า 7 วัน</b>
@@ -144,7 +146,8 @@
         <span>กราฟระดับน้ำรายสถานี เรดาร์ฝน และรายงานสถานการณ์น้ำ</span>
         <span class="link-go">เปิด thaiwater.net ↗</span>
       </a>
-    </aside>
+      </div>
+    </section>
   </div>
 
   <div class="grid-2">
