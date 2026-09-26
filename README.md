@@ -20,3 +20,11 @@ gh secret set X_BEARER_TOKEN
 node scripts/build-feed.mjs
 python -m http.server -d site 8765
 ```
+
+## โพสต์จากชุมชน (api/)
+ผู้เข้าเว็บแชร์ลิงก์โพสต์ X / Facebook ได้เอง เก็บใน Vercel Blob (private) ผ่าน API บน Vercel
+`https://thai-flood-watch-api.vercel.app/api/posts`
+
+- โพสต์ขึ้นทันที · ส่งได้ 5 ครั้ง/10 นาที ต่อ IP · ถูกรายงาน 3 ครั้ง (หรือผู้แชร์รายงานเอง) จะซ่อนอัตโนมัติ
+- ผู้ดูแล: เปิดหน้าเว็บด้วย `#admin` แล้วใส่รหัส (อยู่ในไฟล์ `api/.admin-key` ในเครื่อง ไม่ขึ้น git) เพื่อดูโพสต์ที่ถูกซ่อน ซ่อน/แสดง/ลบ
+- Deploy API: `cd api && vercel deploy --prod`

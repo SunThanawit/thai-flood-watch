@@ -182,6 +182,46 @@
     </section>
   </div>
 
+  <section class="card community" id="community" aria-labelledby="community-h">
+    <div class="community-head">
+      <div>
+        <h2 id="community-h">โพสต์จากชุมชน</h2>
+        <p class="hint">แชร์ลิงก์โพสต์ X หรือ Facebook เกี่ยวกับน้ำท่วม ขอความช่วยเหลือ หรือภาพสถานการณ์ในพื้นที่ ทุกคนที่เข้าเว็บจะเห็นทันที</p>
+      </div>
+      <form class="share-form" id="share-form" novalidate>
+        <label class="visually-hidden" for="share-url">ลิงก์โพสต์</label>
+        <input type="url" id="share-url" inputmode="url" autocomplete="off" required
+          placeholder="วางลิงก์โพสต์ เช่น https://x.com/…/status/… หรือ https://www.facebook.com/…">
+        <label class="visually-hidden" for="share-note">รายละเอียดเพิ่มเติม</label>
+        <input type="text" id="share-note" maxlength="140" autocomplete="off" placeholder="พื้นที่หรือสถานการณ์ (ไม่บังคับ)">
+        <input type="text" id="share-website" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+        <button type="submit" class="btn" id="share-btn">แชร์โพสต์</button>
+        <p class="share-msg" id="share-msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="community-bar">
+      <div class="seg" role="group" aria-label="กรองแพลตฟอร์ม" id="community-filter">
+        <button type="button" data-filter="all" aria-pressed="true">ทั้งหมด <span class="count" id="c-all"></span></button>
+        <button type="button" data-filter="x" aria-pressed="false">X <span class="count" id="c-x"></span></button>
+        <button type="button" data-filter="facebook" aria-pressed="false">Facebook <span class="count" id="c-facebook"></span></button>
+      </div>
+      <button type="button" class="new-pill" id="community-new" hidden></button>
+    </div>
+
+    <div id="admin-bar" class="admin-bar" hidden>
+      <label for="admin-key">รหัสผู้ดูแล</label>
+      <input type="password" id="admin-key" autocomplete="off">
+      <button type="button" class="btn-ghost" id="admin-apply">เข้าโหมดผู้ดูแล</button>
+      <span id="admin-state" class="hint"></span>
+    </div>
+
+    <div class="cposts" id="cposts" aria-live="polite"></div>
+    <div class="cposts-more">
+      <button type="button" class="btn-ghost" id="community-more" hidden>โหลดเพิ่ม</button>
+    </div>
+  </section>
+
   <footer class="foot">
     <p>ข้อมูล: <a href="https://www.thaiwater.net" target="_blank" rel="noopener">คลังข้อมูลน้ำแห่งชาติ (ThaiWater / สสน.)</a>,
       <a href="https://www.gdacs.org" target="_blank" rel="noopener">GDACS</a>, <a href="https://sites.research.google/floods/" target="_blank" rel="noopener">Google Flood Hub</a>,
@@ -193,5 +233,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="app.js"></script>
+<script src="community.js" defer></script>
 </body>
 </html>
