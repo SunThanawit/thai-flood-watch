@@ -289,7 +289,7 @@
     try {
       const res = await fetch(`${API}/posts`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: headers({ "Content-Type": "application/json" }),
         body: JSON.stringify({ url, note: $("share-note").value, website: $("share-website").value }),
       });
       const body = await res.json().catch(() => ({}));
@@ -422,8 +422,8 @@
       const hidden = state.posts.filter((p) => p.hidden).length;
       adminStatus(
         state.posts.length
-          ? `เข้าโหมดผู้ดูแลแล้ว · ${state.posts.length} โพสต์ (ถูกซ่อน ${hidden}) · ปุ่ม ซ่อน/แสดง/ลบ อยู่ใต้แต่ละโพสต์`
-          : "เข้าโหมดผู้ดูแลแล้ว · ยังไม่มีโพสต์ให้จัดการ เมื่อมีคนแชร์ ปุ่ม ซ่อน/แสดง/ลบ จะอยู่ใต้แต่ละโพสต์",
+          ? `เข้าโหมดผู้ดูแลแล้ว · ${state.posts.length} โพสต์ (ถูกซ่อน ${hidden}) · ปุ่ม ซ่อน/แสดง/ลบ อยู่ใต้แต่ละโพสต์ · แชร์ลิงก์ได้ไม่จำกัด`
+          : "เข้าโหมดผู้ดูแลแล้ว · ยังไม่มีโพสต์ให้จัดการ เมื่อมีคนแชร์ ปุ่ม ซ่อน/แสดง/ลบ จะอยู่ใต้แต่ละโพสต์ · แชร์ลิงก์ได้ไม่จำกัด",
         "ok",
       );
       $("admin-bar").classList.add("on");

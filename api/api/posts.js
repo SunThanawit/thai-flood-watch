@@ -36,6 +36,8 @@ export const GET = handle(async (request) => {
 });
 
 export const POST = handle(async (request) => {
+  const admin = isAdmin(request);
+  if (!admin && request.headers.has("x-admin-key")) throw new HttpError(401, "รหัสผู้ดูแลไม่ถูกต้อง");
   const body = await readBody(request);
   if (body.website) throw new HttpError(400, "ไม่สามารถส่งได้"); // honeypot field
   let post = parsePostUrl(body.url);
@@ -58,7 +60,8 @@ export const POST = handle(async (request) => {
     if (dup) {
       throw new HttpError(409, dup.hidden ? "โพสต์นี้ถูกซ่อนแล้วจากการรายงาน" : "มีคนแชร์โพสต์นี้ไว้แล้ว");
     }
-    takeRate(data, key, "post", [
+    // Admins can share without limits
+    if (!admin) takeRate(data, key, "post", [
       { max: 5, windowMs: 10 * 60e3 },
       { max: 20, windowMs: 24 * 3600e3 },
     ]);
