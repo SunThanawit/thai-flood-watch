@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>เฝ้าระวังน้ำท่วมไทย</title>
+<meta name="description" content="แดชบอร์ดสถานการณ์น้ำท่วมประเทศไทยแบบเรียลไทม์: ระดับน้ำ ฝน 24 ชม. เขื่อน ข่าวล่าสุด และโพสต์ #น้ำท่วม บน X">
+<meta property="og:title" content="เฝ้าระวังน้ำท่วมไทย">
+<meta property="og:description" content="แผนที่จุดน้ำล้นตลิ่ง ฝนตกหนัก เขื่อน และข่าวน้ำท่วมล่าสุด อัปเดตอัตโนมัติ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Bai+Jamjuree:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M2 20c3.5 0 3.5-3 7-3s3.5 3 7 3 3.5-3 7-3 3.5 3 7 3" /><path d="M2 26c3.5 0 3.5-3 7-3s3.5 3 7 3 3.5-3 7-3 3.5 3 7 3" /><path d="M16 3v10M12 9l4 4 4-4" /></svg>
+    <div>
+      <h1>เฝ้าระวังน้ำท่วมไทย</h1>
+      <p class="sub">ระดับน้ำ · ฝน 24 ชม. · เขื่อน · ข่าว · #น้ำท่วม บน X</p>
+    </div>
+  </div>
+  <div class="status">
+    <span class="live-dot" id="live-dot" aria-hidden="true"></span>
+    <span id="status-text">กำลังโหลดข้อมูล…</span>
+    <button type="button" id="refresh-btn" class="btn-ghost">รีเฟรช</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="kpis" aria-label="สรุปสถานการณ์">
+    <article class="kpi kpi-crit">
+      <span class="kpi-label">สถานีน้ำล้นตลิ่ง</span>
+      <strong class="kpi-value" id="k-overflow">–</strong>
+      <span class="kpi-foot" id="k-overflow-foot">จากสถานีโทรมาตร</span>
+    </article>
+    <article class="kpi kpi-warn">
+      <span class="kpi-label">น้ำมาก (70–100% ความจุลำน้ำ)</span>
+      <strong class="kpi-value" id="k-high">–</strong>
+      <span class="kpi-foot" id="k-rising">–</span>
+    </article>
+    <article class="kpi kpi-rain">
+      <span class="kpi-label">ฝนสูงสุด 24 ชม.</span>
+      <strong class="kpi-value"><span id="k-rainmax">–</span><small> มม.</small></strong>
+      <span class="kpi-foot" id="k-rainmax-foot">–</span>
+    </article>
+    <article class="kpi">
+      <span class="kpi-label">สถานีฝนหนักมาก (&gt;90 มม.)</span>
+      <strong class="kpi-value" id="k-rain90">–</strong>
+      <span class="kpi-foot" id="k-rain35">–</span>
+    </article>
+    <article class="kpi">
+      <span class="kpi-label">เขื่อนใหญ่เกิน 80%</span>
+      <strong class="kpi-value" id="k-dam">–</strong>
+      <span class="kpi-foot" id="k-dam-foot">–</span>
+    </article>
+  </section>
+
+  <div class="grid">
+    <section class="map-card" aria-label="แผนที่จุดน้ำท่วม">
+      <div class="map-tools">
+        <fieldset class="layers">
+          <legend class="visually-hidden">ชั้นข้อมูล</legend>
+          <label><input type="checkbox" id="lyr-wl" checked> <i class="sw sw-crit"></i>ระดับน้ำ</label>
+          <label><input type="checkbox" id="lyr-rain" checked> <i class="sw sw-rain"></i>ฝนหนัก</label>
+          <label><input type="checkbox" id="lyr-dam" checked> <i class="sw sw-dam"></i>เขื่อน</label>
+          <label><input type="checkbox" id="lyr-gdacs" checked> <i class="sw sw-gdacs"></i>GDACS</label>
+        </fieldset>
+        <label class="only-crit"><input type="checkbox" id="only-crit" checked> เฉพาะน้ำมาก/ล้นตลิ่ง</label>
+      </div>
+      <div id="map" role="region" aria-label="แผนที่"></div>
+      <div class="legend" aria-label="คำอธิบายสัญลักษณ์">
+        <span><i class="dot" style="background:var(--lv5)"></i>ล้นตลิ่ง &gt;100%</span>
+        <span><i class="dot" style="background:var(--lv4)"></i>น้ำมาก 70–100%</span>
+        <span><i class="dot" style="background:var(--lv3)"></i>ปกติ</span>
+        <span><i class="dot" style="background:var(--lv2)"></i>น้ำน้อย</span>
+        <span><i class="ring"></i>ฝน 24 ชม. (ขนาด = ปริมาณ)</span>
+        <span><i class="sq"></i>เขื่อน (% ความจุ)</span>
+      </div>
+    </section>
+
+    <aside class="feed-card" aria-label="ฟีดล่าสุด">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="tab-x" aria-controls="pane-x" aria-selected="true">X #น้ำท่วม</button>
+        <button type="button" role="tab" id="tab-news" aria-controls="pane-news" aria-selected="false">ข่าวล่าสุด <span class="count" id="news-count"></span></button>
+        <button type="button" role="tab" id="tab-crit" aria-controls="pane-crit" aria-selected="false">จุดวิกฤต <span class="count" id="crit-count"></span></button>
+      </div>
+      <div class="pane" id="pane-x" role="tabpanel" aria-labelledby="tab-x"></div>
+      <div class="pane" id="pane-news" role="tabpanel" aria-labelledby="tab-news" hidden></div>
+      <div class="pane" id="pane-crit" role="tabpanel" aria-labelledby="tab-crit" hidden>
+        <input type="search" id="crit-filter" class="filter" placeholder="ค้นหาจังหวัด / สถานี / ลุ่มน้ำ" aria-label="ค้นหาจุดวิกฤต">
+        <ol class="crit-list" id="crit-list"></ol>
+      </div>
+    </aside>
+  </div>
+
+  <div class="grid-2">
+    <section class="card" aria-labelledby="prov-h">
+      <h2 id="prov-h">จังหวัดที่ต้องเฝ้าระวัง</h2>
+      <p class="hint">นับสถานีน้ำล้นตลิ่งและน้ำมาก รวมกับสถานีฝนหนักมาก กดชื่อจังหวัดเพื่อดูบนแผนที่</p>
+      <ol class="prov-list" id="prov-list"></ol>
+    </section>
+
+    <section class="card" aria-labelledby="dam-h">
+      <h2 id="dam-h">เขื่อนขนาดใหญ่</h2>
+      <p class="hint">ปริมาณน้ำเก็บกักเทียบความจุ (% รนก.) เรียงจากมากไปน้อย</p>
+      <ol class="dam-list" id="dam-list"></ol>
+    </section>
+
+    <section class="card hotline" aria-labelledby="hot-h">
+      <h2 id="hot-h">สายด่วนขอความช่วยเหลือ</h2>
+      <ul class="hot-list">
+        <li><a href="tel:1784"><b>1784</b><span>ปภ. แจ้งเหตุสาธารณภัย</span></a></li>
+        <li><a href="tel:1669"><b>1669</b><span>เจ็บป่วยฉุกเฉิน</span></a></li>
+        <li><a href="tel:191"><b>191</b><span>เหตุด่วนเหตุร้าย</span></a></li>
+        <li><a href="tel:1555"><b>1555</b><span>กรุงเทพมหานคร</span></a></li>
+        <li><a href="tel:1460"><b>1460</b><span>กรมชลประทาน</span></a></li>
+        <li><a href="tel:1182"><b>1182</b><span>กรมอุตุนิยมวิทยา</span></a></li>
+        <li><a href="tel:1586"><b>1586</b><span>กรมทางหลวง (เส้นทางน้ำท่วม)</span></a></li>
+        <li><a href="tel:1146"><b>1146</b><span>กรมทางหลวงชนบท</span></a></li>
+      </ul>
+      <p class="hint">กดเบอร์บนมือถือเพื่อโทรได้ทันที</p>
+    </section>
+  </div>
+
+  <footer class="foot">
+    <p>ข้อมูล: <a href="https://www.thaiwater.net" target="_blank" rel="noopener">คลังข้อมูลน้ำแห่งชาติ (ThaiWater / สสน.)</a>,
+      <a href="https://www.gdacs.org" target="_blank" rel="noopener">GDACS</a>,
+      Google News, X · แผนที่ © Esri, OpenStreetMap.
+      ระดับน้ำและฝนดึงจาก ThaiWater โดยตรงทุก 5 นาที ข่าวและโพสต์ X อัปเดตทุกประมาณ 10 นาที</p>
+    <p>ข้อมูลจากสถานีอัตโนมัติอาจคลาดเคลื่อน ใช้ประกอบการตัดสินใจร่วมกับประกาศของ ปภ. และหน่วยงานในพื้นที่</p>
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
