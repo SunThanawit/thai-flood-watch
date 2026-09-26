@@ -467,6 +467,38 @@ $("prov-list").addEventListener("click", (e) => {
   $("map").scrollIntoView({ behavior: "smooth", block: "center" });
 });
 
+/* ---------------- windy embed ---------------- */
+
+const WINDY_VIEWS = {
+  focus: { lat: 13.749, lon: 99.742, zoom: 9 },
+  thailand: { lat: 13.2, lon: 101.0, zoom: 5 },
+};
+const windy = { overlay: "rain", view: "focus" };
+
+function updateWindy() {
+  const v = WINDY_VIEWS[windy.view];
+  const p = new URLSearchParams({
+    lat: v.lat, lon: v.lon, detailLat: v.lat, detailLon: v.lon, zoom: v.zoom,
+    level: "surface", overlay: windy.overlay, product: windy.overlay === "radar" ? "radar" : "ecmwf",
+    menu: "", message: "true", marker: "", calendar: "now", pressure: "", type: "map",
+    location: "coordinates", detail: "", metricWind: "km/h", metricTemp: "°C", radarRange: "-1",
+  });
+  $("windy").src = `https://embed.windy.com/embed2.html?${p}`;
+  $("windy-link").href = `https://www.windy.com/?${windy.overlay},${v.lat},${v.lon},${v.zoom}`;
+}
+
+function segGroup(id, key, attr) {
+  $(id).addEventListener("click", (e) => {
+    const btn = e.target.closest(`button[data-${attr}]`);
+    if (!btn || btn.dataset[attr] === windy[key]) return;
+    windy[key] = btn.dataset[attr];
+    for (const b of $(id).querySelectorAll("button")) b.setAttribute("aria-pressed", String(b === btn));
+    updateWindy();
+  });
+}
+segGroup("windy-overlay", "overlay", "overlay");
+segGroup("windy-view", "view", "view");
+
 async function refreshWater() {
   try {
     await Promise.all([loadWater(), loadGdacs()]);
