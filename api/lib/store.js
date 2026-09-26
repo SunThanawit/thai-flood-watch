@@ -12,7 +12,9 @@ export async function load() {
   const res = await get(PATH, { access: "private", useCache: false });
   if (!res || res.statusCode !== 200) return { data: structuredClone(EMPTY), etag: null };
   const text = await new Response(res.stream).text();
-  return { data: { ...EMPTY, ...JSON.parse(text) }, etag: res.blob.etag };
+  // A compressed response carries a weak ETag (W/"…"); conditional writes
+  // compare against the strong form, so drop the prefix.
+  return { data: { ...EMPTY, ...JSON.parse(text) }, etag: res.blob.etag.replace(/^W\//, "") };
 }
 
 // Runs mutate(data) and saves; retries on a concurrent write.
@@ -33,8 +35,9 @@ export async function update(mutate) {
       });
       return result;
     } catch (err) {
-      if (err instanceof BlobPreconditionFailedError) continue;
-      throw err;
+      if (!(err instanceof BlobPreconditionFailedError)) throw err;
+      console.warn(`posts.json write conflict, retry ${attempt + 1}`);
+      await new Promise((r) => setTimeout(r, 50 + Math.random() * 150 * (attempt + 1)));
     }
   }
   throw new HttpError(503, "ระบบกำลังยุ่ง กรุณาลองใหม่อีกครั้ง");
