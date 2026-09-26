@@ -24,12 +24,14 @@ function cleanNote(s) {
 export const OPTIONS = preflight;
 
 export const GET = handle(async (request) => {
-  const admin = isAdmin(request);
-  if (!admin && request.headers.has("x-admin-key")) throw new HttpError(401, "รหัสผู้ดูแลไม่ถูกต้อง");
+  // Admin reads use their own URL (?admin=1) so the CDN never serves them the
+  // cached public list; the CDN cache key does not include the X-Admin-Key header.
+  const admin = new URL(request.url).searchParams.has("admin");
+  if (admin && !isAdmin(request)) throw new HttpError(401, "รหัสผู้ดูแลไม่ถูกต้อง");
   const { data } = await load();
   const posts = data.posts.filter((p) => admin || !p.hidden).map((p) => publicPost(p, admin));
   return json(request, { posts, updated: new Date().toISOString() }, 200, {
-    "Cache-Control": admin ? "no-store" : "public, max-age=0, s-maxage=15, stale-while-revalidate=60",
+    "Cache-Control": admin ? "private, no-store" : "public, max-age=0, s-maxage=15, stale-while-revalidate=60",
   });
 });
 

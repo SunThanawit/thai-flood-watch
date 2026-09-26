@@ -318,7 +318,14 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
   border: 0; border-radius: 999px; padding: 5px 14px; cursor: pointer; animation: rise .3s ease-out;
 }
 @keyframes rise { from { transform: translateY(4px); opacity: 0; } }
-.admin-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border: 1px dashed var(--lv4); border-radius: 8px; font-size: .85rem; }
+.admin-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 12px; border: 1px dashed var(--lv4); border-radius: 8px; font-size: .85rem; background: var(--warn-bg); }
+.admin-bar.on { border-style: solid; border-color: var(--lv3); background: color-mix(in srgb, var(--lv3) 10%, var(--surface)); }
+.admin-title { font-family: var(--font-display); }
+.admin-bar .btn { padding: 6px 14px; font-size: .85rem; }
+.admin-bar .btn[disabled] { opacity: .6; cursor: wait; }
+.admin-state { flex-basis: 100%; font-size: .85rem; font-weight: 500; color: var(--muted); }
+.admin-state:empty { display: none; }
+.admin-state.ok { color: var(--lv3); } .admin-state.err { color: var(--lv5); }
 .admin-bar input { font: .85rem var(--font-body); padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-2); color: var(--ink); }
 
 .cposts { display: flex; gap: 14px; align-items: flex-start; }

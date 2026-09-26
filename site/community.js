@@ -222,7 +222,8 @@
   }
 
   async function fetchPosts() {
-    const res = await fetch(`${API}/posts`, { headers: headers(), cache: state.admin ? "no-store" : "default" });
+    const url = state.admin ? `${API}/posts?admin=1` : `${API}/posts`;
+    const res = await fetch(url, { headers: headers(), cache: state.admin ? "no-store" : "default" });
     if (res.status === 401) throw Object.assign(new Error("key"), { status: 401 });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return (await res.json()).posts || [];
@@ -398,28 +399,78 @@
 
   /* ---------- admin (open the page with #admin) ---------- */
 
+  function adminStatus(text, kind = "") {
+    const el = $("admin-state");
+    el.textContent = text;
+    el.className = `admin-state ${kind}`;
+  }
+
   async function enterAdmin(key) {
+    if (!key) {
+      adminStatus("ใส่รหัสผู้ดูแลก่อน", "err");
+      $("admin-key").focus();
+      return;
+    }
+    const btn = $("admin-apply");
+    btn.disabled = true;
+    btn.textContent = "กำลังตรวจสอบ…";
     state.admin = true;
     state.adminKey = key;
     try {
       state.posts = await fetchPosts();
       store.set("flood-admin-key", key);
-      $("admin-state").textContent = "โหมดผู้ดูแล: เห็นโพสต์ที่ถูกซ่อน ซ่อน/แสดง/ลบได้";
+      const hidden = state.posts.filter((p) => p.hidden).length;
+      adminStatus(
+        state.posts.length
+          ? `เข้าโหมดผู้ดูแลแล้ว · ${state.posts.length} โพสต์ (ถูกซ่อน ${hidden}) · ปุ่ม ซ่อน/แสดง/ลบ อยู่ใต้แต่ละโพสต์`
+          : "เข้าโหมดผู้ดูแลแล้ว · ยังไม่มีโพสต์ให้จัดการ เมื่อมีคนแชร์ ปุ่ม ซ่อน/แสดง/ลบ จะอยู่ใต้แต่ละโพสต์",
+        "ok",
+      );
+      $("admin-bar").classList.add("on");
+      btn.textContent = "ออกจากโหมดผู้ดูแล";
+      btn.dataset.mode = "exit";
       render();
     } catch (err) {
       state.admin = false;
-      $("admin-state").textContent = err.status === 401 ? "รหัสไม่ถูกต้อง" : "เชื่อมต่อไม่สำเร็จ";
+      state.adminKey = "";
+      store.set("flood-admin-key", "");
+      adminStatus(err.status === 401 ? "รหัสไม่ถูกต้อง ลองใหม่อีกครั้ง" : "เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ ลองใหม่อีกครั้ง", "err");
+      btn.textContent = "เข้าโหมดผู้ดูแล";
+      btn.dataset.mode = "";
+    } finally {
+      btn.disabled = false;
     }
   }
 
-  if (location.hash === "#admin") {
+  async function exitAdmin() {
+    state.admin = false;
+    state.adminKey = "";
+    store.set("flood-admin-key", "");
+    $("admin-key").value = "";
+    $("admin-bar").classList.remove("on");
+    $("admin-apply").textContent = "เข้าโหมดผู้ดูแล";
+    $("admin-apply").dataset.mode = "";
+    adminStatus("ออกจากโหมดผู้ดูแลแล้ว");
+    await initialLoad();
+  }
+
+  function showAdminBar() {
+    if (!$("admin-bar").hidden) return;
     $("admin-bar").hidden = false;
     $("admin-key").value = state.adminKey;
-    $("admin-apply").addEventListener("click", () => enterAdmin($("admin-key").value.trim()));
+    $("admin-bar").scrollIntoView({ behavior: "smooth", block: "center" });
     if (state.adminKey) enterAdmin(state.adminKey);
-    else initialLoad();
-  } else {
-    initialLoad();
+    else $("admin-key").focus({ preventScroll: true });
   }
+
+  $("admin-bar").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if ($("admin-apply").dataset.mode === "exit") exitAdmin();
+    else enterAdmin($("admin-key").value.trim());
+  });
+  window.addEventListener("hashchange", () => { if (location.hash === "#admin") showAdminBar(); });
+
+  initialLoad();
+  if (location.hash === "#admin") showAdminBar();
   setInterval(poll, POLL_MS);
 })();

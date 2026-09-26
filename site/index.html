@@ -209,12 +209,13 @@
       <button type="button" class="new-pill" id="community-new" hidden></button>
     </div>
 
-    <div id="admin-bar" class="admin-bar" hidden>
-      <label for="admin-key">รหัสผู้ดูแล</label>
-      <input type="password" id="admin-key" autocomplete="off">
-      <button type="button" class="btn-ghost" id="admin-apply">เข้าโหมดผู้ดูแล</button>
-      <span id="admin-state" class="hint"></span>
-    </div>
+    <form id="admin-bar" class="admin-bar" hidden>
+      <b class="admin-title">ผู้ดูแล</b>
+      <label class="visually-hidden" for="admin-key">รหัสผู้ดูแล</label>
+      <input type="password" id="admin-key" autocomplete="current-password" placeholder="รหัสผู้ดูแล">
+      <button type="submit" class="btn" id="admin-apply">เข้าโหมดผู้ดูแล</button>
+      <span id="admin-state" class="admin-state" role="status" aria-live="polite"></span>
+    </form>
 
     <div class="cposts" id="cposts" aria-live="polite"></div>
     <div class="cposts-more">
