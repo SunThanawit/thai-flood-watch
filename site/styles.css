@@ -168,7 +168,7 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
 .links-card { display: grid; gap: 12px; }
 .links-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
 .links-head .hint { margin: 0; }
-.link-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.link-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
 .link-grid li { display: flex; }
 .link-tile {
   flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px;
@@ -308,6 +308,8 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
   .feed-card { contain: none; height: 560px; }
   .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .link-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* five tiles in two columns: the first spans the row so none sits alone */
+  .link-grid li:first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 640px) {
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
