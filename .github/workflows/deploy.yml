@@ -34,6 +34,9 @@ jobs:
       - name: Build Bangkok pump stations
         run: node scripts/build-pumps.mjs
         continue-on-error: true
+      - name: Build Bangkok road flooding
+        run: node scripts/build-floodalert.mjs
+        continue-on-error: true
       - name: Version asset URLs
         run: sh scripts/bump-version.sh "${GITHUB_SHA::7}"
       - uses: actions/configure-pages@v5

@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Bai+Jamjuree:wght@600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="styles.css?v=202609281325">
+<link rel="stylesheet" href="styles.css?v=202609281346">
 </head>
 <body>
 <header class="topbar">
@@ -73,6 +73,7 @@
           <label><input type="checkbox" id="lyr-dam" checked> <i class="sw sw-dam"></i>เขื่อน</label>
           <label><input type="checkbox" id="lyr-gdacs" checked> <i class="sw sw-gdacs"></i>GDACS</label>
           <label><input type="checkbox" id="lyr-pump" checked> <i class="sw sw-pump"></i>สถานีสูบน้ำ กทม.</label>
+          <label><input type="checkbox" id="lyr-road" checked> <i class="sw sw-road"></i>ถนนน้ำท่วม กทม.</label>
         </fieldset>
         <label class="only-crit"><input type="checkbox" id="only-crit" checked> เฉพาะน้ำมาก/ล้นตลิ่ง</label>
       </div>
@@ -85,6 +86,7 @@
         <span><i class="ring"></i>ฝน 24 ชม. (ขนาด = ปริมาณ)</span>
         <span><i class="sq"></i>เขื่อน (% ความจุ)</span>
         <span><i class="pump-dot" style="background:var(--pump-run)"></i>สูบน้ำ กทม. (สี = สถานะบ่อ)</span>
+        <span><i class="road-line"></i>ถนนน้ำท่วม กทม. (เส้นเข้ม = เซ็นเซอร์, เส้นจาง = รายงาน สนน.)</span>
       </div>
     </section>
 
@@ -142,6 +144,35 @@
           <input type="search" id="pump-search" class="filter" placeholder="ค้นหาชื่อบ่อ / เขต">
         </div>
         <ol class="pump-list" id="pump-list"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="card fa-card" id="roads" aria-labelledby="fa-h">
+    <div class="pumps-head">
+      <div>
+        <h2 id="fa-h">ถนนน้ำท่วม กทม.</h2>
+        <p class="hint" id="fa-status">กำลังโหลด…</p>
+      </div>
+    </div>
+
+    <div class="fa-top">
+      <ul class="fa-counts" id="fa-counts" aria-label="จุดวัดระดับน้ำบนถนน"></ul>
+      <div class="fa-trend-wrap">
+        <span class="fa-change-h">จุดวัดที่พบน้ำท่วม แต่ละรอบ</span>
+        <div id="fa-trend"></div>
+      </div>
+    </div>
+    <div class="fa-change" id="fa-change"></div>
+
+    <div class="fa-lists">
+      <div class="fa-col">
+        <h3 class="pumps-sub">ถนนที่เซ็นเซอร์พบน้ำท่วมตอนนี้ <span class="count" id="fa-roads-count"></span></h3>
+        <ol class="fa-list" id="fa-roads"></ol>
+      </div>
+      <div class="fa-col">
+        <h3 class="pumps-sub">รายงานถนนที่ยังมีน้ำท่วมขัง สำนักการระบายน้ำ <span class="count" id="fa-report-count"></span></h3>
+        <ol class="fa-list" id="fa-report"></ol>
       </div>
     </div>
   </section>
@@ -210,7 +241,7 @@
       <ol class="prov-list" id="prov-list"></ol>
     </section>
 
-    <section class="card" aria-labelledby="dam-h">
+    <section class="card dam-card" aria-labelledby="dam-h">
       <h2 id="dam-h">เขื่อนขนาดใหญ่</h2>
       <p class="hint">ปริมาณน้ำเก็บกักเทียบความจุ (% รนก.) เรียงจากมากไปน้อย</p>
       <ol class="dam-list" id="dam-list"></ol>
@@ -283,8 +314,9 @@
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="app.js?v=202609281325"></script>
-<script src="pumps.js?v=202609281325" defer></script>
-<script src="community.js?v=202609281325" defer></script>
+<script src="app.js?v=202609281346"></script>
+<script src="pumps.js?v=202609281346" defer></script>
+<script src="floodalert.js?v=202609281346" defer></script>
+<script src="community.js?v=202609281346" defer></script>
 </body>
 </html>

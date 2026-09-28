@@ -5,6 +5,8 @@
 // fails we start from the snapshot already deployed and roll it forward with
 // the dashboard's live WebSocket feed, which sends whole station records.
 import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { extractTurbo } from "../api/lib/turbo.js";
 
 const SOURCE = "https://pumps.bangkok.go.th/";
@@ -12,7 +14,10 @@ const DEPLOYED = "https://sunthanawit.github.io/thai-flood-watch/data/pumps.json
 const WS = "wss://pumps.bangkok.go.th/socket.io/?EIO=4&transport=websocket";
 const NS = "/iot/devices";
 const LISTEN_MS = 90 * 1000;
-const OUT = new URL("../site/data/pumps.json", import.meta.url);
+// $OUT_DIR lets the relay write elsewhere without touching the repo copy
+const OUT = process.env.OUT_DIR
+  ? pathToFileURL(join(process.env.OUT_DIR, "pumps.json"))
+  : new URL("../site/data/pumps.json", import.meta.url);
 
 // The dashboard's own legend: green = ready, red = in progress, yellow = malfunction, grey/unknown = closed
 const STATUS = { red: "running", green: "ready", yellow: "fault", grey: "off", unknown: "off" };

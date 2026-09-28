@@ -20,6 +20,10 @@
   --pump-fault: #d7263d;
   --pump-off: #8a979a;
   --pump-stale: #c8d1d0;
+  --road-high: #9e0f23;
+  --road-flood: #cf1f30;
+  --road-minor: #b86200;
+  --road-ok: #2e9e6a;
   --crit-bg: #fdecee;
   --warn-bg: #fdf1e4;
   --rain-bg: #eceefd;
@@ -37,6 +41,7 @@
     --lv5: #ff5468; --lv4: #ff9d3f; --lv3: #45c48a; --lv2: #e0bb3a; --lv1: #b98452;
     --rain: #7f8fff; --dam: #3fb6d3; --gdacs: #c27ae6;
     --pump-run: #3aa8ff; --pump-ready: #45c48a; --pump-fault: #ff5468; --pump-off: #7d8b8e; --pump-stale: #34484c;
+    --road-high: #ff4d6a; --road-flood: #ff8a5c; --road-minor: #ffc04d; --road-ok: #45c48a;
     --crit-bg: #3a1419; --warn-bg: #3a2511; --rain-bg: #1b2046;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3);
     color-scheme: dark;
@@ -48,6 +53,7 @@
   --lv5: #ff5468; --lv4: #ff9d3f; --lv3: #45c48a; --lv2: #e0bb3a; --lv1: #b98452;
   --rain: #7f8fff; --dam: #3fb6d3; --gdacs: #c27ae6;
     --pump-run: #3aa8ff; --pump-ready: #45c48a; --pump-fault: #ff5468; --pump-off: #7d8b8e; --pump-stale: #34484c;
+    --road-high: #ff4d6a; --road-flood: #ff8a5c; --road-minor: #ffc04d; --road-ok: #45c48a;
   --crit-bg: #3a1419; --warn-bg: #3a2511; --rain-bg: #1b2046;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3);
   color-scheme: dark;
@@ -132,6 +138,7 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
 .sw-rain { border: 2px solid var(--rain); }
 .sw-dam { background: var(--dam); border-radius: 2px; }
 .sw-pump { background: var(--pump-run); border-radius: 50%; box-shadow: inset 0 0 0 2px var(--surface), 0 0 0 1px var(--pump-run); }
+.sw-road { width: 14px; height: 4px; border-radius: 2px; background: var(--road-flood); }
 .sw-gdacs { background: var(--gdacs); transform: rotate(45deg); border-radius: 1px; }
 #map { flex: 1 0 auto; height: var(--map-h); min-height: 360px; background: var(--surface-2); }
 .legend {
@@ -246,6 +253,14 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
 .bar { display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: var(--surface-2); }
 .bar i { display: block; height: 100%; }
 .pnum { font: 500 .78rem var(--font-num); color: var(--muted); white-space: nowrap; }
+
+/* Side by side, the dam card takes its height from the row (set by the province
+   card) and its list scrolls; stacked on a phone it keeps its full length. */
+@media (min-width: 641px) {
+  .grid-2 { align-items: stretch; }
+  .dam-card { contain: size; display: flex; flex-direction: column; min-height: 0; }
+  .dam-card .dam-list { flex: 1; min-height: 0; overflow-y: auto; padding-right: 6px; }
+}
 
 .dam-list li { display: grid; grid-template-columns: minmax(0, 8em) 1fr 3.8em; align-items: center; gap: 8px; padding: 4px 0; font-size: .88rem; }
 .dam-list .dname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -469,4 +484,55 @@ input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px;
 }
 @media (prefers-reduced-motion: reduce) {
   .pump-icon.running, .live-chip.on::before { animation: none; }
+}
+
+/* Bangkok road flooding */
+.legend .road-line { width: 16px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--road-high), var(--road-minor)); }
+.fa-card { display: grid; gap: 12px; }
+.fa-card .hint { margin: 4px 0 0; }
+.fa-top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; justify-content: space-between; }
+.fa-counts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.fa-counts li {
+  display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center;
+  padding: 8px 14px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; min-width: 9.5em;
+}
+.fa-counts i { grid-row: span 2; width: 6px; height: 100%; border-radius: 3px; }
+.fa-counts b { font: 600 1.5rem/1.1 var(--font-num); font-variant-numeric: tabular-nums; }
+.fa-counts span { font-size: .76rem; color: var(--muted); }
+.fa-trend-wrap { display: grid; gap: 2px; min-width: 0; flex: 0 1 300px; }
+.fa-trend { width: 100%; height: auto; display: block; }
+.fa-trend .t { font: 500 10px var(--font-body); fill: var(--muted); }
+.fa-change-h { font-size: .78rem; color: var(--muted); }
+.fa-change { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.chip-s {
+  font-size: .8rem; padding: 2px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--c) 45%, var(--line));
+  background: color-mix(in srgb, var(--c) 10%, var(--surface)); color: var(--ink);
+}
+.chip-s b { font-family: var(--font-num); color: var(--c); }
+.fa-lists { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.fa-col { min-width: 0; display: flex; flex-direction: column; }
+.fa-col .pumps-sub { margin: 0 0 6px; }
+.fa-list { list-style: none; margin: 0; padding: 0; max-height: 380px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; }
+.fa-list li button {
+  width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; text-align: left;
+  padding: 9px 12px; background: none; border: 0; border-bottom: 1px solid var(--line); color: var(--ink);
+  font: .86rem var(--font-body); cursor: pointer;
+}
+.fa-list li:last-child button { border-bottom: 0; }
+.fa-list li button:hover:not([disabled]) { background: var(--surface-2); }
+.fa-list li button[disabled] { cursor: default; }
+.fa-name { font-weight: 600; }
+.fa-cm {
+  font: 600 .78rem var(--font-num); white-space: nowrap; padding: 1px 8px; border-radius: 4px;
+  color: var(--c); background: color-mix(in srgb, var(--c) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--line));
+}
+.fa-sub { grid-column: 1 / -1; font-size: .76rem; color: var(--muted); overflow-wrap: anywhere; }
+.fa-lv {
+  grid-row: 1; grid-column: 2; font-size: .72rem; font-weight: 600; white-space: nowrap; padding: 1px 8px; border-radius: 4px;
+  color: var(--c); background: color-mix(in srgb, var(--c) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--line));
+}
+.fa-rname { grid-row: 1; grid-column: 1; }
+.fa-list .empty { padding: 14px 12px; color: var(--muted); font-size: .86rem; }
+@media (max-width: 900px) {
+  .fa-lists { grid-template-columns: 1fr; }
 }

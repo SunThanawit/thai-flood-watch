@@ -10,7 +10,7 @@ export function cors(request) {
   const origin = request.headers.get("origin");
   return {
     "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://sunthanawit.github.io",
-    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
     "Access-Control-Max-Age": "600",
     Vary: "Origin",

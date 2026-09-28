@@ -3,7 +3,11 @@
 // Starts from data/pumps.json, then listens to the department's live feed
 // (socket.io over a plain WebSocket, no library) for per-station updates.
 (() => {
-  const SNAPSHOT = "data/pumps.json";
+  // Relayed from a Thai IP every ~10 min (fresher); the static file is the fallback
+  const SNAPSHOTS = [
+    "https://thai-flood-watch-api.vercel.app/api/snapshot?name=pumps",
+    "data/pumps.json",
+  ];
   const WS_URL = "wss://pumps.bangkok.go.th/socket.io/?EIO=4&transport=websocket";
   const NS = "/iot/devices";
   const STALE_MS = 30 * 60 * 1000;
@@ -250,13 +254,20 @@
   /* ---------- data ---------- */
 
   async function loadSnapshot() {
-    try {
-      const res = await fetch(`${SNAPSHOT}?t=${Date.now()}`, { cache: "no-store" });
-      if (!res.ok) return;
-      const j = await res.json();
-      state.snapshotAt = j.generated;
-      for (const s of j.stations || []) merge(s);
-    } catch { /* live feed may still work */ }
+    const got = await Promise.all(SNAPSHOTS.map(async (url) => {
+      try {
+        const res = await fetch(`${url}${url.includes("?") ? "&" : "?"}t=${Math.floor(Date.now() / 60000)}`);
+        return res.ok ? await res.json() : null;
+      } catch {
+        return null;
+      }
+    }));
+    // Merge both; per-station lastSync decides which record wins
+    for (const j of got) {
+      if (!j?.stations) continue;
+      if (!state.snapshotAt || j.generated > state.snapshotAt) state.snapshotAt = j.generated;
+      for (const s of j.stations) merge(s);
+    }
     renderAll();
   }
 
@@ -321,4 +332,5 @@
   }, 60 * 1000);
 
   loadSnapshot().then(connect);
+  setInterval(loadSnapshot, 5 * 60 * 1000);
 })();

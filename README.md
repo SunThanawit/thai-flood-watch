@@ -28,3 +28,13 @@ python -m http.server -d site 8765
 - โพสต์ขึ้นทันที · ส่งได้ 5 ครั้ง/10 นาที ต่อ IP · ถูกรายงาน 3 ครั้ง (หรือผู้แชร์รายงานเอง) จะซ่อนอัตโนมัติ
 - ผู้ดูแล: เปิดหน้าเว็บด้วย `#admin` แล้วใส่รหัส (อยู่ในไฟล์ `api/.admin-key` ในเครื่อง ไม่ขึ้น git) เพื่อดูโพสต์ที่ถูกซ่อน ซ่อน/แสดง/ลบ
 - Deploy API: `cd api && vercel deploy --prod`
+
+## ข้อมูล กทม. ที่เปิดให้เฉพาะ IP ในไทย (relay)
+สถานีสูบน้ำ (pumps.bangkok.go.th) และถนนน้ำท่วม (now.bangkok.go.th/flood-alert.html) ปฏิเสธ IP ต่างประเทศ
+รวมถึง GitHub Actions และ Vercel จึงใช้เครื่องในไทยเป็นตัวส่งต่อ
+
+- `scripts/relay.mjs` ดึงข้อมูลทั้งสองแหล่ง แล้วอัปโหลดไปที่ `api/snapshot` (ใช้รหัสใน `api/.admin-key`)
+- Task Scheduler ชื่อ `ThaiFloodWatchRelay` รัน `scripts/relay-hidden.vbs` ทุก 10 นาที (ทำงานเฉพาะตอนเครื่องเปิดและล็อกอินอยู่)
+- log: `%TEMP%	hai-flood-relayelay.log`
+- หน้าเว็บโหลดจาก API ก่อน ถ้าไม่มีจะใช้ไฟล์ใน `site/data/` แทน สถานีสูบน้ำยังรับอัปเดตสดผ่าน WebSocket ในเบราว์เซอร์ของผู้ชมในไทย
+- ปิด relay: `schtasks /Delete /TN ThaiFloodWatchRelay /F`
