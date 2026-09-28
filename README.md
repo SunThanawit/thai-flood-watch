@@ -1,5 +1,7 @@
 # เฝ้าระวังน้ำท่วมไทย
 
+เว็บ: https://flood.digitalok.site (Vercel โปรเจกต์ `flood-digitalok` ใน `web/` ดึงหน้าจาก GitHub Pages; ที่อยู่เดิม sunthanawit.github.io/thai-flood-watch/ ส่งต่อมาที่นี่)
+
 แดชบอร์ดสถานการณ์น้ำท่วมแบบเรียลไทม์ (static site บน GitHub Pages)
 
 - **ระดับน้ำ / ฝน 24 ชม. / เขื่อน**: เบราว์เซอร์ดึงจาก ThaiWater (`api-v3.thaiwater.net`) โดยตรงทุก 5 นาที
@@ -35,6 +37,7 @@ python -m http.server -d site 8765
 
 - `scripts/relay.mjs` ดึงข้อมูลทั้งสองแหล่ง แล้วอัปโหลดไปที่ `api/snapshot` (ใช้รหัสใน `api/.admin-key`)
 - Task Scheduler ชื่อ `ThaiFloodWatchRelay` รัน `scripts/relay-hidden.vbs` ทุก 10 นาที (ทำงานเฉพาะตอนเครื่องเปิดและล็อกอินอยู่)
-- log: `%TEMP%	hai-flood-relayelay.log`
+- log: `%TEMP%	hai-flood-relay
+elay.log`
 - หน้าเว็บโหลดจาก API ก่อน ถ้าไม่มีจะใช้ไฟล์ใน `site/data/` แทน สถานีสูบน้ำยังรับอัปเดตสดผ่าน WebSocket ในเบราว์เซอร์ของผู้ชมในไทย
 - ปิด relay: `schtasks /Delete /TN ThaiFloodWatchRelay /F`

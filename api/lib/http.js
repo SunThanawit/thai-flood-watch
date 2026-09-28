@@ -2,7 +2,6 @@ import { HttpError } from "./store.js";
 
 const ALLOWED_ORIGINS = new Set([
   "https://flood.digitalok.site",
-  "http://flood.digitalok.site", // until GitHub finishes the HTTPS certificate
   "https://sunthanawit.github.io",
   "http://127.0.0.1:8765",
   "http://localhost:8765",
