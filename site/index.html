@@ -11,9 +11,49 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Bai+Jamjuree:wght@600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="styles.css?v=202609281845">
+<link rel="stylesheet" href="styles.css?v=202609281855">
 </head>
 <body>
+<!-- Digitalok site bar: same menu as www.digitalok.site so this page reads as part of it -->
+<header class="dok-bar">
+  <div class="dok-inner">
+    <a class="dok-logo" href="https://www.digitalok.site/" aria-label="Digitalok หน้าแรก">
+      <span><img src="assets/dok-logo-256.webp" alt="Digitalok" width="110" height="28"></span>
+    </a>
+    <div class="dok-right">
+      <nav aria-label="เมนูหลัก" class="dok-nav">
+        <a class="dok-link" href="https://www.digitalok.site/#products">เลือกซื้อสินค้า</a>
+        <a class="dok-link" href="https://www.digitalok.site/#groupbuys">หาตี้ / รวมกลุ่มซื้อ</a>
+        <a class="dok-link" href="https://www.digitalok.site/ai-playbooks">เรียนใช้ AI</a>
+        <a class="dok-link" href="https://www.digitalok.site/member/orders">สินค้าของฉัน / คำสั่งซื้อ</a>
+        <a class="dok-link is-current" href="./" aria-current="page">เฝ้าระวังน้ำท่วม</a>
+      </nav>
+      <button type="button" class="dok-btn" id="dok-menu-btn" aria-expanded="false" aria-controls="dok-panel">
+        <span class="dok-m">เมนู</span><span class="dok-d">เพิ่มเติม</span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+      <div id="dok-panel" class="dok-panel" hidden>
+        <nav aria-label="เมนูเพิ่มเติม">
+          <div class="dok-panel-main">
+            <a class="dok-link is-current" href="./" aria-current="page">เฝ้าระวังน้ำท่วม</a>
+            <a class="dok-link" href="https://www.digitalok.site/#products">เลือกซื้อสินค้า</a>
+            <a class="dok-link" href="https://www.digitalok.site/#groupbuys">หาตี้ / รวมกลุ่มซื้อ</a>
+            <a class="dok-link" href="https://www.digitalok.site/ai-playbooks">เรียนใช้ AI</a>
+            <a class="dok-link" href="https://www.digitalok.site/member/orders">สินค้าของฉัน / คำสั่งซื้อ</a>
+          </div>
+          <a class="dok-link" href="https://www.digitalok.site/discover">ค้นหาทั้งเว็บ (สินค้า บทความ เครื่องมือ)</a>
+          <a class="dok-link" href="https://www.digitalok.site/collections">Collections</a>
+          <a class="dok-link" href="https://www.digitalok.site/prompthub">PromptHub</a>
+          <a class="dok-link" href="https://www.digitalok.site/updates">สินค้าใหม่และอัปเดท</a>
+          <a class="dok-link" href="https://www.digitalok.site/affiliate/guide">แนะนำเพื่อน</a>
+          <a class="dok-link" href="https://suntnw.craft.me/pFS2xjScfjTzTI" target="_blank" rel="noopener noreferrer">วิธีชำระเงิน (เปิดแท็บใหม่)</a>
+          <a class="dok-link" href="https://lin.ee/hSXYFzh" target="_blank" rel="noopener noreferrer">แจ้งปัญหา / ติดต่อ LINE</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
+
 <header class="topbar">
   <div class="brand">
     <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M2 20c3.5 0 3.5-3 7-3s3.5 3 7 3 3.5-3 7-3 3.5 3 7 3" /><path d="M2 26c3.5 0 3.5-3 7-3s3.5 3 7 3 3.5-3 7-3 3.5 3 7 3" /><path d="M16 3v10M12 9l4 4 4-4" /></svg>
@@ -315,9 +355,19 @@
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="app.js?v=202609281845"></script>
-<script src="pumps.js?v=202609281845" defer></script>
-<script src="floodalert.js?v=202609281845" defer></script>
-<script src="community.js?v=202609281845" defer></script>
+<script>
+(() => {
+  const btn = document.getElementById("dok-menu-btn");
+  const panel = document.getElementById("dok-panel");
+  const set = (open) => { panel.hidden = !open; btn.setAttribute("aria-expanded", String(open)); };
+  btn.addEventListener("click", (e) => { e.stopPropagation(); set(panel.hidden); });
+  document.addEventListener("click", (e) => { if (!panel.hidden && !panel.contains(e.target)) set(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) { set(false); btn.focus(); } });
+})();
+</script>
+<script src="app.js?v=202609281855"></script>
+<script src="pumps.js?v=202609281855" defer></script>
+<script src="floodalert.js?v=202609281855" defer></script>
+<script src="community.js?v=202609281855" defer></script>
 </body>
 </html>

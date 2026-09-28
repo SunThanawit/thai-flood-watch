@@ -12,7 +12,7 @@ const OUT = process.env.OUT_DIR
   : new URL("../site/data/feed.json", import.meta.url);
 const PREVIOUS = [
   "https://thai-flood-watch-api.vercel.app/api/snapshot?name=feed",
-  "https://sunthanawit.github.io/thai-flood-watch/data/feed.json",
+  "https://flood.digitalok.site/data/feed.json",
 ];
 const HASHTAG = "#น้ำท่วม";
 

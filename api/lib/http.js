@@ -1,6 +1,7 @@
 import { HttpError } from "./store.js";
 
 const ALLOWED_ORIGINS = new Set([
+  "https://flood.digitalok.site",
   "https://sunthanawit.github.io",
   "http://127.0.0.1:8765",
   "http://localhost:8765",
@@ -9,7 +10,7 @@ const ALLOWED_ORIGINS = new Set([
 export function cors(request) {
   const origin = request.headers.get("origin");
   return {
-    "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://sunthanawit.github.io",
+    "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://flood.digitalok.site",
     "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
     "Access-Control-Max-Age": "600",

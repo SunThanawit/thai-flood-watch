@@ -10,7 +10,7 @@ import { pathToFileURL } from "node:url";
 import { extractTurbo } from "../api/lib/turbo.js";
 
 const SOURCE = "https://pumps.bangkok.go.th/";
-const DEPLOYED = "https://sunthanawit.github.io/thai-flood-watch/data/pumps.json";
+const DEPLOYED = "https://flood.digitalok.site/data/pumps.json";
 const WS = "wss://pumps.bangkok.go.th/socket.io/?EIO=4&transport=websocket";
 const NS = "/iot/devices";
 const LISTEN_MS = 90 * 1000;
