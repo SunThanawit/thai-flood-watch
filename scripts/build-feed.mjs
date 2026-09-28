@@ -1,9 +1,19 @@
 // Builds site/data/feed.json: latest Thai flood news (Google News RSS) and,
 // when X_BEARER_TOKEN is set, recent posts for #น้ำท่วม from the X API.
-// Runs in GitHub Actions on a schedule; the browser reads the JSON same-origin.
-import { writeFile, mkdir } from "node:fs/promises";
+// Runs in GitHub Actions on a schedule (and from the relay); the browser reads it.
+// Google News sometimes refuses cloud IPs (503), so failed fetches are retried
+// and, if everything fails, the previous news is kept instead of blanking it.
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 
-const OUT = new URL("../site/data/feed.json", import.meta.url);
+const OUT = process.env.OUT_DIR
+  ? pathToFileURL(join(process.env.OUT_DIR, "feed.json"))
+  : new URL("../site/data/feed.json", import.meta.url);
+const PREVIOUS = [
+  "https://thai-flood-watch-api.vercel.app/api/snapshot?name=feed",
+  "https://sunthanawit.github.io/thai-flood-watch/data/feed.json",
+];
 const HASHTAG = "#น้ำท่วม";
 
 const NEWS_QUERIES = [
@@ -25,15 +35,51 @@ function tag(xml, name) {
   return m ? decodeEntities(m[1]).trim() : "";
 }
 
+async function fetchWithRetry(url, attempts = 3) {
+  let last;
+  for (let i = 0; i < attempts; i++) {
+    if (i) await new Promise((r) => setTimeout(r, 3000 * i));
+    try {
+      const res = await fetch(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+          "Accept-Language": "th-TH,th;q=0.9",
+        },
+        signal: AbortSignal.timeout(15000),
+      });
+      if (res.ok) return await res.text();
+      last = new Error(`HTTP ${res.status}`);
+    } catch (err) {
+      last = err;
+    }
+  }
+  throw last;
+}
+
+// Newest previous feed that still has news (relay snapshot or deployed file)
+async function previousFeed() {
+  const found = [];
+  for (const url of PREVIOUS) {
+    try {
+      const res = await fetch(`${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`, { signal: AbortSignal.timeout(15000) });
+      if (res.ok) found.push(await res.json());
+    } catch { /* try the next one */ }
+  }
+  try {
+    found.push(JSON.parse(await readFile(OUT, "utf8")));
+  } catch { /* no local copy */ }
+  return found
+    .filter((f) => f?.news?.length)
+    .sort((a, b) => String(b.newsUpdated || b.generated).localeCompare(String(a.newsUpdated || a.generated)))[0];
+}
+
 async function fetchNews() {
   const seen = new Set();
   const items = [];
   for (const q of NEWS_QUERIES) {
     const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=th&gl=TH&ceid=TH:th`;
     try {
-      const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 flood-dashboard" } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const xml = await res.text();
+      const xml = await fetchWithRetry(url);
       for (const raw of xml.match(/<item>[\s\S]*?<\/item>/g) ?? []) {
         const source = tag(raw, "source");
         let title = tag(raw, "title");
@@ -104,7 +150,17 @@ async function fetchX() {
   }
 }
 
-const [news, x] = await Promise.all([fetchNews(), fetchX()]);
+let [news, x] = await Promise.all([fetchNews(), fetchX()]);
+let newsUpdated = new Date().toISOString();
+if (!news.length) {
+  const prev = await previousFeed();
+  if (prev) {
+    news = prev.news;
+    newsUpdated = prev.newsUpdated || prev.generated;
+    console.warn(`news: all queries failed, kept ${news.length} items from ${newsUpdated}`);
+  }
+  if (!x.posts.length && prev?.x?.posts?.length) x = prev.x;
+}
 await mkdir(new URL(".", OUT), { recursive: true });
-await writeFile(OUT, JSON.stringify({ generated: new Date().toISOString(), news, x }, null, 1));
-console.log(`feed.json: ${news.length} news, ${x.posts.length} X posts${x.enabled ? "" : " (X disabled)"}`);
+await writeFile(OUT, JSON.stringify({ generated: new Date().toISOString(), newsUpdated, news, x }, null, 1));
+console.log(`feed.json: ${news.length} news (as of ${newsUpdated}), ${x.posts.length} X posts${x.enabled ? "" : " (X disabled)"}`);

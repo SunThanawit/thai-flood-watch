@@ -2,7 +2,9 @@
 
 const THAIWATER = "https://api-v3.thaiwater.net/api/v1/thaiwater30/public/thailand_main";
 const GDACS = "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&country=Thailand";
-const FEED = "data/feed.json";
+// The deployed file (GitHub Actions) and the relayed copy (owner's machine);
+// whichever has the newer news wins
+const FEEDS = ["data/feed.json", "https://thai-flood-watch-api.vercel.app/api/snapshot?name=feed"];
 const HASHTAG = "#น้ำท่วม";
 const WATER_REFRESH_MS = 5 * 60 * 1000;
 const FEED_REFRESH_MS = 2 * 60 * 1000;
@@ -161,10 +163,22 @@ async function loadGdacs() {
 }
 
 async function loadFeed() {
-  try {
-    const res = await fetch(`${FEED}?t=${Date.now()}`, { cache: "no-store" });
-    if (res.ok) state.feed = await res.json();
-  } catch { /* keep previous feed */ }
+  const got = await Promise.all(FEEDS.map(async (url) => {
+    try {
+      const res = await fetch(`${url}${url.includes("?") ? "&" : "?"}t=${Math.floor(Date.now() / 60000)}`, { cache: "no-store" });
+      return res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  }));
+  const asOf = (f) => String(f.newsUpdated || f.generated || "");
+  const best = got.filter((f) => f?.news?.length).sort((a, b) => asOf(b).localeCompare(asOf(a)))[0];
+  if (best) {
+    const withX = got.find((f) => f?.x?.posts?.length);
+    state.feed = { ...best, x: best.x?.posts?.length ? best.x : withX?.x || best.x };
+  } else if (!state.feed) {
+    state.feed = got.find(Boolean) || null;
+  }
   renderFeed();
 }
 
@@ -373,8 +387,12 @@ function renderFeed() {
   const recent = Date.now() - 3 * 3600e3;
 
   $("news-count").textContent = news.length || "";
+  const newsAt = feed?.newsUpdated ? new Date(feed.newsUpdated) : null;
+  const staleNote = newsAt && Date.now() - newsAt.getTime() > 60 * 60 * 1000
+    ? `<p class="hint" style="margin:10px 16px 0">ดึงข่าวใหม่ไม่ได้ชั่วคราว แสดงรายการล่าสุดเมื่อ ${ago(newsAt)}</p>`
+    : "";
   $("pane-news").innerHTML = news.length
-    ? news.map((n) => {
+    ? staleNote + news.map((n) => {
         const d = new Date(n.published);
         return `<article class="news">
           <a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>

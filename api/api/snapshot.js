@@ -1,11 +1,11 @@
 // Data snapshots that only a Thai IP can fetch (pumps.bangkok.go.th,
 // now.bangkok.go.th). A relay on the owner's machine PUTs them here with the
-// admin key; the dashboard GETs them. ?name=pumps | floodalert
+// admin key; the dashboard GETs them. ?name=pumps | floodalert | feed
 import { get, put } from "@vercel/blob";
 import { isAdmin, HttpError } from "../lib/store.js";
 import { json, cors, preflight, handle } from "../lib/http.js";
 
-const NAMES = new Set(["pumps", "floodalert"]);
+const NAMES = new Set(["pumps", "floodalert", "feed"]);
 const MAX_BYTES = 3 * 1024 * 1024;
 
 function nameOf(request) {
@@ -41,7 +41,7 @@ export const PUT = handle(async (request) => {
   } catch {
     throw new HttpError(400, "invalid JSON");
   }
-  if (!data.generated || !Array.isArray(data.stations ?? data.roads)) throw new HttpError(400, "unexpected shape");
+  if (!data.generated || !Array.isArray(data.stations ?? data.roads ?? data.news)) throw new HttpError(400, "unexpected shape");
   await put(`snapshots/${name}.json`, body, {
     access: "private",
     contentType: "application/json",
