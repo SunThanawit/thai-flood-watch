@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Bai+Jamjuree:wght@600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="styles.css?v=202609261506">
+<link rel="stylesheet" href="styles.css?v=202609281325">
 </head>
 <body>
 <header class="topbar">
@@ -56,6 +56,11 @@
       <strong class="kpi-value" id="k-dam">–</strong>
       <span class="kpi-foot" id="k-dam-foot">–</span>
     </article>
+    <article class="kpi kpi-pump">
+      <span class="kpi-label">เครื่องสูบน้ำ กทม. กำลังสูบ</span>
+      <strong class="kpi-value"><span id="k-pump-run">–</span><small id="k-pump-total"></small></strong>
+      <span class="kpi-foot" id="k-pump-foot">กำลังโหลด…</span>
+    </article>
   </section>
 
   <div class="grid">
@@ -67,6 +72,7 @@
           <label><input type="checkbox" id="lyr-rain" checked> <i class="sw sw-rain"></i>ฝนหนัก</label>
           <label><input type="checkbox" id="lyr-dam" checked> <i class="sw sw-dam"></i>เขื่อน</label>
           <label><input type="checkbox" id="lyr-gdacs" checked> <i class="sw sw-gdacs"></i>GDACS</label>
+          <label><input type="checkbox" id="lyr-pump" checked> <i class="sw sw-pump"></i>สถานีสูบน้ำ กทม.</label>
         </fieldset>
         <label class="only-crit"><input type="checkbox" id="only-crit" checked> เฉพาะน้ำมาก/ล้นตลิ่ง</label>
       </div>
@@ -78,6 +84,7 @@
         <span><i class="dot" style="background:var(--lv2)"></i>น้ำน้อย</span>
         <span><i class="ring"></i>ฝน 24 ชม. (ขนาด = ปริมาณ)</span>
         <span><i class="sq"></i>เขื่อน (% ความจุ)</span>
+        <span><i class="pump-dot" style="background:var(--pump-run)"></i>สูบน้ำ กทม. (สี = สถานะบ่อ)</span>
       </div>
     </section>
 
@@ -95,6 +102,49 @@
       </div>
     </aside>
   </div>
+
+  <section class="card pumps-card" id="pumps" aria-labelledby="pumps-h">
+    <div class="pumps-head">
+      <div>
+        <h2 id="pumps-h">สถานีสูบน้ำ กทม.</h2>
+        <p class="hint">บ่อสูบน้ำที่ติดตั้งระบบติดตามของสำนักการระบายน้ำ กรุงเทพมหานคร สถานะอัปเดตสดจาก <a href="https://pumps.bangkok.go.th/" target="_blank" rel="noopener">pumps.bangkok.go.th</a></p>
+      </div>
+      <span class="live-chip" id="pump-live" role="status">กำลังเชื่อมต่อ…</span>
+    </div>
+
+    <div class="pumps-body">
+      <div class="pumps-summary">
+        <dl class="pump-stats">
+          <div><dt>บ่อสูบน้ำ</dt><dd id="ps-stations">–</dd></div>
+          <div><dt>เครื่องสูบน้ำ</dt><dd id="ps-pumps">–</dd></div>
+          <div><dt>กำลังมอเตอร์รวม</dt><dd><span id="ps-kw">–</span><small> kW</small></dd></div>
+        </dl>
+        <p class="hint" id="ps-kw-note"></p>
+
+        <h3 class="pumps-sub">เครื่องสูบน้ำ แยกตามสถานะ</h3>
+        <div class="sbar" id="pump-bar" aria-hidden="true"></div>
+        <ul class="sbar-legend" id="pump-legend"></ul>
+
+        <h3 class="pumps-sub">บ่อสูบน้ำ แยกตามสถานะ</h3>
+        <div class="sbar" id="station-bar" aria-hidden="true"></div>
+        <ul class="sbar-legend" id="station-legend"></ul>
+      </div>
+
+      <div class="pumps-list-wrap">
+        <div class="pumps-list-tools">
+          <div class="seg" role="group" aria-label="กรองสถานะ" id="pump-filter">
+            <button type="button" data-f="fault" aria-pressed="true">ชำรุด</button>
+            <button type="button" data-f="running" aria-pressed="false">กำลังสูบ</button>
+            <button type="button" data-f="stale" aria-pressed="false">ขาดการติดต่อ</button>
+            <button type="button" data-f="all" aria-pressed="false">ทั้งหมด</button>
+          </div>
+          <label class="visually-hidden" for="pump-search">ค้นหาบ่อสูบน้ำ</label>
+          <input type="search" id="pump-search" class="filter" placeholder="ค้นหาชื่อบ่อ / เขต">
+        </div>
+        <ol class="pump-list" id="pump-list"></ol>
+      </div>
+    </div>
+  </section>
 
   <div class="stack">
     <section class="map-card" aria-labelledby="windy-h">
@@ -233,7 +283,8 @@
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="app.js?v=202609261506"></script>
-<script src="community.js?v=202609261506" defer></script>
+<script src="app.js?v=202609281325"></script>
+<script src="pumps.js?v=202609281325" defer></script>
+<script src="community.js?v=202609281325" defer></script>
 </body>
 </html>

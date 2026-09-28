@@ -47,16 +47,18 @@ async function fromPage() {
   return raw.filter(usable).map(normalize);
 }
 
+// Newest of the deployed snapshot and the committed one (a fresh local run).
 async function baseline() {
+  const candidates = [];
   try {
     const res = await fetch(`${DEPLOYED}?t=${Date.now()}`, { signal: AbortSignal.timeout(15000) });
-    if (res.ok) return (await res.json()).stations;
-  } catch { /* fall through to the committed copy */ }
+    if (res.ok) candidates.push(await res.json());
+  } catch { /* not deployed yet */ }
   try {
-    return JSON.parse(await readFile(OUT, "utf8")).stations;
-  } catch {
-    return [];
-  }
+    candidates.push(JSON.parse(await readFile(OUT, "utf8")));
+  } catch { /* no committed copy */ }
+  candidates.sort((a, b) => String(b.generated).localeCompare(String(a.generated)));
+  return candidates[0]?.stations ?? [];
 }
 
 // Minimal socket.io v4 client over a native WebSocket.
