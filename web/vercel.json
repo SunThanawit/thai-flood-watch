@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/", "destination": "https://sunthanawit.github.io/thai-flood-watch/" },
+    { "source": "/:path*", "destination": "https://sunthanawit.github.io/thai-flood-watch/:path*" }
+  ],
+  "headers": [
+    {
+      "source": "/data/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, s-maxage=60, stale-while-revalidate=300" }]
+    }
+  ]
+}
