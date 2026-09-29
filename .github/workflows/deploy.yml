@@ -40,6 +40,9 @@ jobs:
       - name: Build TMD province forecast
         run: node scripts/build-tmd.mjs
         continue-on-error: true
+      - name: Build Traffy flood reports
+        run: node scripts/build-traffy.mjs
+        continue-on-error: true
       - name: Version asset URLs
         run: sh scripts/bump-version.sh "${GITHUB_SHA::7}"
       - uses: actions/configure-pages@v5

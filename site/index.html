@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Bai+Jamjuree:wght@600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="styles.css?v=202609290937">
+<link rel="stylesheet" href="styles.css?v=202609291402">
 </head>
 <body>
 <!-- Digitalok site bar: same menu as www.digitalok.site so this page reads as part of it -->
@@ -122,6 +122,7 @@
           <label><input type="checkbox" id="lyr-gdacs" checked> <i class="sw sw-gdacs"></i>GDACS</label>
           <label><input type="checkbox" id="lyr-pump" checked> <i class="sw sw-pump"></i>สถานีสูบน้ำ กทม.</label>
           <label><input type="checkbox" id="lyr-road" checked> <i class="sw sw-road"></i>ถนนน้ำท่วม กทม.</label>
+          <label><input type="checkbox" id="lyr-traffy"> <i class="sw sw-traffy"></i>ร้องเรียนน้ำท่วม (Traffy)</label>
         </fieldset>
         <label class="only-crit"><input type="checkbox" id="only-crit" checked> เฉพาะน้ำมาก/ล้นตลิ่ง</label>
       </div>
@@ -134,6 +135,7 @@
         <span><i class="ring"></i>ฝน 24 ชม. (ขนาด = ปริมาณ)</span>
         <span><i class="sq"></i>เขื่อน (% ความจุ)</span>
         <span><i class="pump-dot" style="background:var(--pump-run)"></i>สูบน้ำ กทม. (สี = สถานะบ่อ)</span>
+        <span><i class="tf-dot"></i>จุดเล็ก = ร้องเรียนน้ำท่วมจากประชาชน (Traffy) สีตามสถานะเรื่อง</span>
         <span><i class="road-line"></i>ถนนน้ำท่วม กทม. (เส้นเข้ม = เซ็นเซอร์, เส้นจาง = รายงาน สนน.)</span>
       </div>
     </section>
@@ -225,6 +227,33 @@
     </div>
   </section>
 
+  <section class="card tf-card" id="traffy" aria-labelledby="tf-h">
+    <div class="pumps-head">
+      <div>
+        <h2 id="tf-h">ประชาชนแจ้งน้ำท่วม กทม. (Traffy Fondue)</h2>
+        <p class="hint" id="tf-meta">กำลังโหลด…</p>
+      </div>
+      <a class="btn" href="https://bangkok.traffy.in.th/" target="_blank" rel="noopener">แจ้งเรื่องที่ Traffy Fondue ↗</a>
+    </div>
+    <div class="tf-body">
+      <div>
+        <dl class="pump-stats">
+          <div><dt>เรื่องที่แจ้ง</dt><dd id="tf-total">–</dd></div>
+          <div><dt>รอรับเรื่อง</dt><dd id="tf-wait">–</dd></div>
+          <div><dt>เสร็จสิ้นแล้ว</dt><dd id="tf-done">–</dd></div>
+        </dl>
+        <h3 class="pumps-sub">สถานะเรื่องที่แจ้ง</h3>
+        <div class="sbar" id="tf-bar" aria-hidden="true"></div>
+        <ul class="sbar-legend" id="tf-legend"></ul>
+        <p class="op-note" style="margin-top:12px">เรื่องที่ประชาชนแจ้งเองผ่านแอป ยังไม่ผ่านการตรวจสอบ รายการนี้ไม่ใช่พื้นที่น้ำท่วมทั้งหมด ตำแหน่งบนแผนที่ปัดเป็นระยะราว 100 เมตร และไม่แสดงข้อความหรือรูปที่ผู้แจ้งส่งมา เพื่อความเป็นส่วนตัว เปิดชั้นข้อมูล "ร้องเรียนน้ำท่วม (Traffy)" บนแผนที่เพื่อดูตำแหน่ง</p>
+      </div>
+      <div>
+        <h3 class="pumps-sub" style="margin-top:0">เขตที่มีคนแจ้งมากที่สุด <span class="count" id="tf-dcount"></span></h3>
+        <ol class="tf-list" id="tf-districts"></ol>
+      </div>
+    </div>
+  </section>
+
   <div class="stack">
     <section class="map-card" aria-labelledby="windy-h">
       <div class="map-tools">
@@ -283,6 +312,12 @@
           <b>iTIC live</b>
           <span class="link-desc">ถนนน้ำท่วม เหตุการณ์ และกล้องวงจรปิดสดทั่วกรุงเทพฯ</span>
           <span class="link-domain">live.iticfoundation.org</span>
+        </a></li>
+        <li><a class="link-tile" href="https://bangkok.traffy.in.th/" target="_blank" rel="noopener">
+          <span class="link-top"><span class="link-kicker">แจ้งปัญหา · ติดตามเรื่อง</span><span class="link-arrow" aria-hidden="true">↗</span></span>
+          <b>Traffy Fondue กทม.</b>
+          <span class="link-desc">แจ้งน้ำท่วมและปัญหาในเมือง แนบรูปและพิกัด ติดตามสถานะได้จากหน่วยงานที่รับเรื่อง</span>
+          <span class="link-domain">bangkok.traffy.in.th</span>
         </a></li>
       </ul>
     </section>
@@ -419,7 +454,7 @@
   <footer class="foot">
     <p>ข้อมูล: <a href="https://www.thaiwater.net" target="_blank" rel="noopener">คลังข้อมูลน้ำแห่งชาติ (ThaiWater / สสน.)</a>,
       <a href="https://www.gdacs.org" target="_blank" rel="noopener">GDACS</a>, <a href="https://sites.research.google/floods/" target="_blank" rel="noopener">Google Flood Hub</a>,
-      Google News, X, <a href="https://data.tmd.go.th/" target="_blank" rel="noopener">กรมอุตุนิยมวิทยา (TMD)</a>, <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (แบบจำลอง GloFAS © Copernicus/ECMWF, CC BY 4.0), HAII · แผนที่ © Esri, OpenStreetMap.
+      Google News, X, <a href="https://bangkok.traffy.in.th/" target="_blank" rel="noopener">Traffy Fondue</a>, <a href="https://data.tmd.go.th/" target="_blank" rel="noopener">กรมอุตุนิยมวิทยา (TMD)</a>, <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (แบบจำลอง GloFAS © Copernicus/ECMWF, CC BY 4.0), HAII · แผนที่ © Esri, OpenStreetMap.
       ระดับน้ำและฝนดึงจาก ThaiWater โดยตรงทุก 5 นาที ข่าวและโพสต์ X อัปเดตทุกประมาณ 10 นาที</p>
     <p>ข้อมูลจากสถานีอัตโนมัติอาจคลาดเคลื่อน ใช้ประกอบการตัดสินใจร่วมกับประกาศของ ปภ. และหน่วยงานในพื้นที่</p>
   </footer>
@@ -436,10 +471,11 @@
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) { set(false); btn.focus(); } });
 })();
 </script>
-<script src="app.js?v=202609290937"></script>
-<script src="pumps.js?v=202609290937" defer></script>
-<script src="floodalert.js?v=202609290937" defer></script>
-<script src="outlook.js?v=202609290937" defer></script>
-<script src="community.js?v=202609290937" defer></script>
+<script src="app.js?v=202609291402"></script>
+<script src="pumps.js?v=202609291402" defer></script>
+<script src="floodalert.js?v=202609291402" defer></script>
+<script src="traffy.js?v=202609291402" defer></script>
+<script src="outlook.js?v=202609291402" defer></script>
+<script src="community.js?v=202609291402" defer></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 // Runs on the owner's machine (a Thai IP) every 10 minutes via Task Scheduler:
 // builds the Bangkok pump + road-flood snapshots, which Thai government sites
 // only serve to Thai IPs, plus the news feed (Google News sometimes refuses
-// GitHub's IPs) and TMD's province forecast, and uploads them to the dashboard API.
+// GitHub's IPs) TMD's province forecast and Traffy flood reports, and uploads them to the dashboard API.
 //
 //   node scripts/relay.mjs          (reads the admin key from api/.admin-key)
 import { execFile } from "node:child_process";
@@ -22,6 +22,7 @@ const JOBS = [
   { name: "floodalert", script: "scripts/build-floodalert.mjs", file: "floodalert.json" },
   { name: "feed", script: "scripts/build-feed.mjs", file: "feed.json" },
   { name: "tmd", script: "scripts/build-tmd.mjs", file: "tmd.json" },
+  { name: "traffy", script: "scripts/build-traffy.mjs", file: "traffy.json" },
 ];
 
 async function log(line) {
