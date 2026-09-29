@@ -59,6 +59,8 @@
   color-scheme: dark;
 }
 
+/* Author display rules (grid, flex...) would otherwise override the hidden attribute */
+[hidden] { display: none !important; }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
