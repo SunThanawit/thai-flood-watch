@@ -145,6 +145,10 @@ async function loadWater() {
   const res = await fetch(THAIWATER, { cache: "no-store" });
   if (!res.ok) throw new Error(`ThaiWater HTTP ${res.status}`);
   const j = await res.json();
+  // Shared with outlook.js (gauge discharge, forecast maps, radar); image tokens
+  // are only valid for a while, so consumers always read the latest response.
+  window.__thaiwater = j;
+  window.dispatchEvent(new Event("thaiwater"));
   state.stations = normalizeStations(j.waterlevel?.data?.data);
   state.rain = normalizeRain(j.rain?.data?.data);
   state.dams = normalizeDams(j.dam?.data?.data);

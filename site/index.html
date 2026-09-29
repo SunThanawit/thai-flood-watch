@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Bai+Jamjuree:wght@600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="styles.css?v=202609282359">
+<link rel="stylesheet" href="styles.css?v=202609290928">
 </head>
 <body>
 <!-- Digitalok site bar: same menu as www.digitalok.site so this page reads as part of it -->
@@ -288,6 +288,64 @@
     </section>
   </div>
 
+  <section class="card outlook" id="outlook" aria-labelledby="outlook-h">
+    <div class="outlook-head">
+      <h2 id="outlook-h">พยากรณ์ทั่วประเทศ</h2>
+      <p class="hint">แนวโน้มน้ำในแม่น้ำสายหลัก ฝนรายจังหวัด 7 วัน แผนที่ฝนพยากรณ์ เรดาร์ และภาพดาวเทียม</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="ข้อมูลพยากรณ์">
+      <button type="button" role="tab" id="ot-rivers" aria-controls="op-rivers" aria-selected="true">แม่น้ำสายหลัก 16 วัน</button>
+      <button type="button" role="tab" id="ot-tmd" aria-controls="op-tmd" aria-selected="false">ฝนรายจังหวัด 7 วัน</button>
+      <button type="button" role="tab" id="ot-maps" aria-controls="op-maps" aria-selected="false">แผนที่ฝน · เรดาร์ · ดาวเทียม</button>
+    </div>
+
+    <div class="op" id="op-rivers" role="tabpanel" aria-labelledby="ot-rivers">
+      <div class="rivers" id="rivers"><p class="op-empty">กำลังโหลดแนวโน้มแม่น้ำ…</p></div>
+      <p class="op-note">ตัวเลขใหญ่คือค่าที่<b>วัดได้จริง</b>จากสถานีของ ThaiWater กราฟคือ<b>แนวโน้ม</b>จากแบบจำลอง GloFAS (Copernicus ผ่าน Open-Meteo) แสดงเป็นเปอร์เซ็นต์เทียบวันนี้ เพราะแบบจำลองระดับโลกให้ปริมาณน้ำสูงกว่าเครื่องวัดหลายเท่า ใช้ดูทิศทางไม่ใช่ตัวเลขจริง แถบสีจางคือช่วงกลาง 50% ของสมาชิกแบบจำลอง ไม่ใช่ระดับน้ำท่วม</p>
+    </div>
+
+    <div class="op" id="op-tmd" role="tabpanel" aria-labelledby="ot-tmd" hidden>
+      <div class="op-tools">
+        <label class="visually-hidden" for="tmd-search">ค้นหาจังหวัด</label>
+        <input type="search" id="tmd-search" class="filter" placeholder="ค้นหาจังหวัด">
+        <button type="button" class="btn-ghost" id="tmd-more" hidden></button>
+        <span class="op-meta" id="tmd-meta"></span>
+      </div>
+      <div class="heat-wrap"><table class="heat" id="tmd-table"><caption class="visually-hidden">ร้อยละพื้นที่ที่คาดว่ามีฝน รายจังหวัด 7 วัน</caption></table></div>
+      <ul class="heat-legend" aria-label="คำอธิบายสี">
+        <li><i style="--v:.1"></i>น้อย</li><li><i style="--v:.4"></i></li><li><i style="--v:.7"></i></li><li><i style="--v:1"></i>มาก</li>
+        <li><i class="storm-key"></i>ขีดส้ม = พยากรณ์พายุฝนฟ้าคะนอง</li>
+      </ul>
+      <p class="op-note">ตัวเลขคือ<b>ร้อยละของพื้นที่จังหวัดที่คาดว่าจะมีฝน</b> (ค่า PercentRainCover ของกรมอุตุนิยมวิทยา) ไม่ใช่โอกาสที่ฝนจะตก และไม่ได้บอกปริมาณฝน ปริมาณฝนดูได้จากแผนที่ในแท็บถัดไป เรียงตามค่าเฉลี่ย 7 วัน</p>
+    </div>
+
+    <div class="op" id="op-maps" role="tabpanel" aria-labelledby="ot-maps" hidden>
+      <div class="op-tools">
+        <div class="seg" role="group" aria-label="ชนิดแผนที่" id="maps-kind">
+          <button type="button" data-k="forecast" aria-pressed="true">พยากรณ์ฝน 3 วัน</button>
+          <button type="button" data-k="radar" aria-pressed="false">เรดาร์ฝน</button>
+          <button type="button" data-k="sat" aria-pressed="false">ดาวเทียม</button>
+        </div>
+        <div class="seg" role="group" aria-label="วันที่พยากรณ์" id="maps-day">
+          <button type="button" data-d="0" aria-pressed="true">วัน 1</button>
+          <button type="button" data-d="1" aria-pressed="false">วัน 2</button>
+          <button type="button" data-d="2" aria-pressed="false">วัน 3</button>
+        </div>
+        <div class="seg" role="group" aria-label="ขอบเขต" id="maps-scope">
+          <button type="button" data-s="country" aria-pressed="true">ทั้งประเทศ</button>
+          <button type="button" data-s="basin" aria-pressed="false">รายลุ่มน้ำ</button>
+        </div>
+        <label class="visually-hidden" for="radar-select">เลือกเรดาร์</label>
+        <select id="radar-select" class="select" hidden></select>
+      </div>
+      <figure class="op-fig">
+        <img id="maps-img" alt="" width="720" height="780" decoding="async">
+        <p class="op-fail" id="maps-fail" hidden>โหลดภาพไม่สำเร็จ ลองใหม่อีกครั้ง หรือดูที่ <a href="https://www.thaiwater.net" target="_blank" rel="noopener">thaiwater.net</a></p>
+        <figcaption id="maps-cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+
   <div class="grid-2">
     <section class="card" aria-labelledby="prov-h">
       <h2 id="prov-h">จังหวัดที่ต้องเฝ้าระวัง</h2>
@@ -361,7 +419,7 @@
   <footer class="foot">
     <p>ข้อมูล: <a href="https://www.thaiwater.net" target="_blank" rel="noopener">คลังข้อมูลน้ำแห่งชาติ (ThaiWater / สสน.)</a>,
       <a href="https://www.gdacs.org" target="_blank" rel="noopener">GDACS</a>, <a href="https://sites.research.google/floods/" target="_blank" rel="noopener">Google Flood Hub</a>,
-      Google News, X · แผนที่ © Esri, OpenStreetMap.
+      Google News, X, <a href="https://data.tmd.go.th/" target="_blank" rel="noopener">กรมอุตุนิยมวิทยา (TMD)</a>, <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (แบบจำลอง GloFAS © Copernicus/ECMWF, CC BY 4.0), HAII · แผนที่ © Esri, OpenStreetMap.
       ระดับน้ำและฝนดึงจาก ThaiWater โดยตรงทุก 5 นาที ข่าวและโพสต์ X อัปเดตทุกประมาณ 10 นาที</p>
     <p>ข้อมูลจากสถานีอัตโนมัติอาจคลาดเคลื่อน ใช้ประกอบการตัดสินใจร่วมกับประกาศของ ปภ. และหน่วยงานในพื้นที่</p>
   </footer>
@@ -378,9 +436,10 @@
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) { set(false); btn.focus(); } });
 })();
 </script>
-<script src="app.js?v=202609282359"></script>
-<script src="pumps.js?v=202609282359" defer></script>
-<script src="floodalert.js?v=202609282359" defer></script>
-<script src="community.js?v=202609282359" defer></script>
+<script src="app.js?v=202609290928"></script>
+<script src="pumps.js?v=202609290928" defer></script>
+<script src="floodalert.js?v=202609290928" defer></script>
+<script src="outlook.js?v=202609290928" defer></script>
+<script src="community.js?v=202609290928" defer></script>
 </body>
 </html>
